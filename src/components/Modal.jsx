@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 
 import Mensaje from './Mensaje'
 
@@ -7,17 +7,34 @@ import CerrarBtn from '../img/cerrar.svg'
 
 
 
-const Modal = ({setModal, animarModal, setAnimarModal,guardarGasto}) => {
+const Modal = ({setModal, animarModal, setAnimarModal, guardarGasto, gastoEditar, setGastoEditar}) => {
 
 
     const [descripcion, setDescripcion] = useState('')
     const [monto, setMonto] = useState('')
     const [categoria, setCategoria] = useState('')
     const [mensaje, setMensaje] = useState('')
+    const [id, setId] = useState('')
+    const [fecha, setFecha] = useState('')
+    const [editado, setEditado] = useState(false)
+
+    useEffect(() => {
+
+        if (Object.keys(gastoEditar).length > 0){
+            setDescripcion(gastoEditar.descripcion)
+            setMonto(gastoEditar.monto)
+            setCategoria(gastoEditar.categoria)  
+            setId(gastoEditar.id) 
+            setFecha(gastoEditar.fecha)
+            setEditado(true)
+        }
+        
+    }, [])
 
     const ocultarModal = () => {
         
         setAnimarModal(false)
+        setGastoEditar({})
 
         setTimeout(() => {
             setModal(false)
@@ -37,7 +54,7 @@ const Modal = ({setModal, animarModal, setAnimarModal,guardarGasto}) => {
             return
         }
 
-        guardarGasto({descripcion, monto, categoria})
+        guardarGasto({descripcion, monto, categoria, id, fecha, editado})
     }
 
 
@@ -52,7 +69,7 @@ const Modal = ({setModal, animarModal, setAnimarModal,guardarGasto}) => {
         </div>
         <form className={`formulario ${animarModal ? "animar" : "cerrar"}`}
             onSubmit={handleSubmit}>
-            <legend>Nuevo Gasto</legend>
+            <legend>{gastoEditar.descripcion ? 'Editar Gasto' : 'Nuevo Gasto'}</legend>
 
             {mensaje && <Mensaje tipo="error">{mensaje}</Mensaje>}
 
@@ -86,19 +103,19 @@ const Modal = ({setModal, animarModal, setAnimarModal,guardarGasto}) => {
                 <select id="categoria"
                     value={categoria}
                     onChange={e => setCategoria(e.target.value)}>
-                        <option value="">Seleccione</option>
+                        <option value="">-- Seleccione --</option>
                         <option value="ahorro">Ahorro</option>
                         <option value="comida">Comida</option>
                         <option value="casa">Casa</option>
                         <option value="ocio">Ocio</option>
-                        <option value="Suscripciones">Suscripciones</option>
-                        <option value="Salud">Salud</option>
-                        <option value="Gastos Varios">Gastos Varios</option>
+                        <option value="salud">Salud</option>
+                        <option value="suscripciones">Suscripciones</option>
+                        <option value="gastos">Gastos Varios</option>
                 </select>
 
             </div>
 
-            <input  type="submit" value="Añadir Gasto"></input>
+            <input  type="submit" value={gastoEditar.descripcion ? 'Guardar Cambios' : 'Añadir Gasto'}></input>
         </form>
 
 
